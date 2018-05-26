@@ -1,0 +1,110 @@
+.ulti-field__container {
+    position: relative;
+
+    display: inline-block;
+
+    width: 300px;
+    height: 600px;
+
+    outline: 1px solid rgba(8, 8, 8, 0.26);
+    background-color: rgba(193, 193, 193, 0.17);
+}
+
+.ulti-field__zone {
+    z-index: 9;
+
+    height: 90px;
+    width: 300px;
+
+    background-color: rgba(10, 196, 255, 0.04);
+
+    /*outline: 1px solid rgba(8, 8, 8, 0.26);*/
+}
+
+.ulti-field__zone1 {
+    position: absolute;
+    top: 0;
+
+    border-bottom:1px solid rgba(8, 8, 8, 0.26);
+}
+
+.ulti-field__zone2 {
+    position: absolute;
+    bottom: 0;
+
+    border-top:1px solid rgba(8, 8, 8, 0.26);
+}
+
+.ulti-field__player {
+    position: absolute;
+    z-index: 19;
+
+    width: 10px;
+    height: 10px;
+
+    border-radius: 10px;
+
+    border: 1px solid #000;
+    transition: all 1s;
+}
+
+.ulti-field__team1 {
+    background-color: blue;
+    border: 1px solid blue;
+
+}
+
+.ulti-field__team2 {
+    background-color: red;
+    border: 1px solid red;
+}
+
+.ulti-field__player1-1 { top: 43px; left: 30px; }
+.ulti-field__player1-2 { top: 43px; left: 45px; }
+.ulti-field__player1-3 { top: 43px; left: 60px; }
+.ulti-field__player1-4 { top: 43px; left: 75px; }
+.ulti-field__player1-5 { top: 43px; left: 90px; }
+
+.ulti-field__player2-1 { bottom: 43px; left: 30px; }
+.ulti-field__player2-2 { bottom: 43px; left: 45px; }
+.ulti-field__player2-3 { bottom: 43px; left: 60px; }
+.ulti-field__player2-4 { bottom: 43px; left: 75px; }
+.ulti-field__player2-5 { bottom: 43px; left: 90px; }
+
+.ulti-field__disc{
+    position: absolute;
+    z-index:29;
+    top: 5px;
+    left: 5px;
+
+    width: 8px;
+    height:8px;
+
+    border-radius: 8px;
+    border:1px solid #000;
+
+    background-color: #fff;
+    transition: all 1s;
+}
+
+.ulti-field__status-line{
+    height:20px;
+    width:300px;
+
+}
+
+.ulti-field__descript-log{
+    display: inline-block;
+    vertical-align: top;
+
+    padding-left:20px;
+
+    width:400px;
+    height:100%;
+}
+
+.ulti-field__descript-log-caption{
+    color: #000;
+    font-size:20px;
+    font-family:Arial, sans-serif;
+}

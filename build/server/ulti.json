@@ -1,0 +1,22 @@
+[
+        {
+            "step" : 0,
+            "speed" : 1,
+            "description": "First step of the trap",
+            "teamOneCoords": {
+                "player0": [4, 4.20],
+                "player1": [5, 4.20],
+                "player2": [6, 4.20],
+                "player3": [7, 4.80],
+                "player4": [12, 4]
+            },
+            "teamTwoCoords": {
+                "player0": [4, 36.20],
+                "player1": [5, 36],
+                "player2": [6, 36],
+                "player3": [7, 36],
+                "player4": [8, 36]
+            },
+            "discOwn" : [0, 3]
+        }
+]
