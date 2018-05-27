@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Created by Iluha on 26.05.2018.
  */
@@ -64,8 +66,6 @@
         this.prevBut = document.querySelector('.ulti-field__controls-prev');
         this.clearBut = document.querySelector('.ulti-field__controls-clear');
         this.fileBut = document.querySelector('.ulti-field__controls-file');
-        this.saveBut = document.querySelector('.ulti-field__controls-save');
-        this.saveLinkBut = document.querySelector('.ulti-field__controls-save-link');
 
         // factor for transition real size of the field to pixels
         this.SIZE_FACTOR = this.fieldWidth / this.FIELD_WIDTH;
@@ -248,8 +248,6 @@
                 parent.currStep = 0;
                 parent.showCurrentDescription('', true);
                 parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
-
-                parent.writeToFile();
             });
 
             parent.fileBut.addEventListener('change', function (evt) {
@@ -288,10 +286,6 @@
 
                 reader.readAsText(file[0]);
             }, false);
-
-            parent.saveBut.addEventListener('click', function(evt){
-                parent.writeToFile(parent.config);
-            });
 
         };
 
@@ -346,35 +340,6 @@
             xhr.send();
 
         };
-
-        this.writeToFile = function(text){
-            // debugger;
-            text = text || 'Hello, world';
-
-            var blob = new Blob([JSON.stringify(text, null, 2)], {type : 'application/json'});
-            var url = URL.createObjectURL(blob);
-            var parent = this;
-
-            var reader = new FileReader();
-
-            reader.onloadend = function(){
-                var tagUrl = reader.result;
-                var event = new Event('click');
-
-                parent.saveLinkBut.href = tagUrl;
-                parent.saveLinkBut.dispatchEvent(event);
-
-                // var temp = '<a href="' + urlHere + '" download> Сохранить разбежку </a>';
-                //
-                // parent.descrElement.innerHTML = "privet" + temp;
-            };
-
-            reader.onerror = function(){
-                parent.showError('Download error. Please, try again!');
-            };
-
-            reader.readAsDataURL(blob);
-        };
     }
 
 
@@ -383,3 +348,8 @@
     // ulti.loadConfig(ulti.initialize, ulti);
     ulti.initialize(ulti.DEFAULT_CONFIG, ulti);
 })();
+
+
+
+
+
