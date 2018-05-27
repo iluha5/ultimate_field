@@ -36,9 +36,19 @@
             },
             "discOwn": [0, 1]
         };
+        this.DEFAULT_CONFIG = [
+            {
+                "name": "default game",
+                "game": [
+                    this.DEFAULT_COORDS_5PLAYERS
+                ]
+            }
+        ];
+
 
 
         this.currStep = 0;
+        this.stepsDescr = [];
 
         this.statusLineElement = document.querySelector('.ulti-field__status-line');
         this.descrElement = document.querySelector('.ulti-field__descript-body');
@@ -51,28 +61,30 @@
         this.teamTwoElements = document.querySelectorAll('.ulti-field__team2');
 
         this.playBut = document.querySelector('.ulti-field__controls-play');
+        this.prevBut = document.querySelector('.ulti-field__controls-prev');
         this.clearBut = document.querySelector('.ulti-field__controls-clear');
         this.fileBut = document.querySelector('.ulti-field__controls-file');
 
         // factor for transition real size of the field to pixels
         this.SIZE_FACTOR = this.fieldWidth / this.FIELD_WIDTH;
 
+        /**
+         * @param {Mixed} n
+         * @return {boolean}
+         * @private
+         * @private
+         */
         this._isNumeric = function (n) {
             return !isNaN(parseFloat(n)) && isFinite(n);
         };
 
-        // this._objLength = function(obj){
-        //     var i = 0;
-        //
-        //     for (let key in obj) {
-        //         i++;
-        //     }
-        //
-        //     return i;
-        // };
-
+        /**
+         *
+         * @param {Object} config
+         * @return {boolean}
+         * @private
+         */
         this._isLastStep = function (config) {
-            // debugger;
             return this.currStep + 1 > Object.keys(config[0].game).length;
         };
 
@@ -99,8 +111,17 @@
         this.showCurrentDescription = function (descript, isClearAll) {
             if (isClearAll) {
                 this.descrElement.innerHTML = '';
+                this.stepsDescr = [];
             } else {
-                this.descrElement.innerHTML = (this.currStep + 1) + '. ' + descript + '<br>' + this.descrElement.innerHTML;
+                descript = (this.currStep + 1) + '. ' + descript + '<br>';
+                this.stepsDescr.push(descript);
+
+                this.descrElement.innerHTML = '';
+                for (let i = 0; i < this.stepsDescr.length; i++){
+                    this.descrElement.innerHTML =  this.stepsDescr[i] + this.descrElement.innerHTML;
+                }
+
+                // this.descrElement.innerHTML = (this.currStep + 1) + '. ' + descript + '<br>' + this.descrElement.innerHTML;
             }
         };
 
@@ -182,9 +203,20 @@
 
         };
 
-        this.showGrid = function () {
+        this.showPrevStep = function(){
+            if (this.currStep === 1) return;
+            if (this.currStep > 1) {
+                this.currStep -= 2;
+                this.stepsDescr.pop();
+                this.stepsDescr.pop();
 
+                this.showStep(this.config[0].game[this.currStep]);
+            }
         };
+
+        // this.showGrid = function () {
+        //
+        // };
 
 
         /**
@@ -199,20 +231,24 @@
 
             parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
 
-            var playButOnClick = parent.playBut.addEventListener('click', function (evt) {
-                // debugger;
+            parent.playBut.addEventListener('click', function (evt) {
                 if (!parent._isLastStep(parent.config)) {
                     parent.showStep(parent.config[0].game[parent.currStep]);
                 }
             });
 
-            var clearButOnClick = parent.clearBut.addEventListener('click', function (evt) {
+            parent.prevBut.addEventListener('click', function (evt) {
+                // debugger;
+                    parent.showPrevStep();
+            });
+
+            parent.clearBut.addEventListener('click', function (evt) {
                 parent.currStep = 0;
                 parent.showCurrentDescription('', true);
                 parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
             });
 
-            var fileButOnChange = parent.fileBut.addEventListener('change', function (evt) {
+            parent.fileBut.addEventListener('change', function (evt) {
                 // var file = evt.target.files;
                 var file = parent.fileBut.files;
                 // console.log(file[0]);
@@ -238,6 +274,7 @@
                     parent.config = loadedData;
                     parent.showCurrentDescription('', true);
                     parent.currStep = 0;
+                    parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
                     // console.log(content);
                 };
 
@@ -306,15 +343,6 @@
 
     var ulti = new Ulti();
 
-    var defaultConfig = [
-        {
-            "name": "default game",
-            "game": [
-                ulti.DEFAULT_COORDS_5PLAYERS
-            ]
-        }
-    ];
-
     // ulti.loadConfig(ulti.initialize, ulti);
-    ulti.initialize(defaultConfig, ulti);
+    ulti.initialize(ulti.DEFAULT_CONFIG, ulti);
 })();
