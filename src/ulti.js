@@ -44,6 +44,11 @@
                 ]
             }
         ];
+        this.GAP_EDGE_END = 13;
+        this.GAP_EDGE_START = 2;
+
+        this.SHOW_GAME_MODE = 0;
+        this.EDIT_GAME_MODE = 1;
 
 
 
@@ -66,6 +71,7 @@
         this.fileBut = document.querySelector('.ulti-field__controls-file');
         this.saveBut = document.querySelector('.ulti-field__controls-save');
         this.saveLinkBut = document.querySelector('.ulti-field__controls-save-link');
+        this.editBut = document.querySelector('.ulti-field__controls-edit');
 
         // factor for transition real size of the field to pixels
         this.SIZE_FACTOR = this.fieldWidth / this.FIELD_WIDTH;
@@ -127,6 +133,22 @@
             }
         };
 
+        this.fetchCoordsOutField = function(coords){
+            var coordX;
+            var coordY;
+
+            // Check if coord is out of the field
+            coordX = ( (coords[0] * this.SIZE_FACTOR) < (this.FIELD_WIDTH * this.SIZE_FACTOR - this.GAP_EDGE_END) ) ?
+                coords[0] : (this.FIELD_WIDTH * this.SIZE_FACTOR - this.GAP_EDGE_END) / this.SIZE_FACTOR;
+            coordX = ( (coordX * this.SIZE_FACTOR) > this.GAP_EDGE_START ) ? coordX : this.GAP_EDGE_START / this.SIZE_FACTOR;
+
+            coordY = ( (coords[1] * this.SIZE_FACTOR) < (this.FIELD_HEIGHT * this.SIZE_FACTOR - this.GAP_EDGE_END) ) ?
+                coords[1] : (this.FIELD_HEIGHT * this.SIZE_FACTOR - this.GAP_EDGE_END) / this.SIZE_FACTOR;
+            coordY = ( (coordY * this.SIZE_FACTOR) > this.GAP_EDGE_START ) ? coordY : this.GAP_EDGE_START / this.SIZE_FACTOR;
+
+            return [coordX, coordY];
+        };
+
         /**
          * Show player on the field with coords.
          * @param {HTMLElement} playerElement
@@ -134,27 +156,17 @@
          * @return {Boolean}
          */
         this.showPlayer = function (playerElement, coords) {
-            var GAP_END = 13;
-            var GAP_START = 2;
-            var coordX;
-            var coordY;
+            var fetchedCoords = [];
 
             if (!this._isNumeric(coords[0]) || !this._isNumeric(coords[1])) {
                 this.showError('Wrong players coords from config file!');
                 return false;
             }
 
-            // Check if coord is out of the field
-            coordX = ( (coords[0] * this.SIZE_FACTOR) < (this.FIELD_WIDTH * this.SIZE_FACTOR - GAP_END) ) ?
-                coords[0] : (this.FIELD_WIDTH * this.SIZE_FACTOR - GAP_END) / this.SIZE_FACTOR;
-            coordX = ( (coordX * this.SIZE_FACTOR) > GAP_START ) ? coordX : GAP_START / this.SIZE_FACTOR;
+            fetchedCoords = this.fetchCoordsOutField(coords);
 
-            coordY = ( (coords[1] * this.SIZE_FACTOR) < (this.FIELD_HEIGHT * this.SIZE_FACTOR - GAP_END) ) ?
-                coords[1] : (this.FIELD_HEIGHT * this.SIZE_FACTOR - GAP_END) / this.SIZE_FACTOR;
-            coordY = ( (coordY * this.SIZE_FACTOR) > GAP_START ) ? coordY : GAP_START / this.SIZE_FACTOR;
-
-            playerElement.style.left = Math.ceil(coordX * this.SIZE_FACTOR) + 'px';
-            playerElement.style.top = Math.ceil(coordY * this.SIZE_FACTOR) + 'px';
+            playerElement.style.left = Math.ceil(fetchedCoords[0] * this.SIZE_FACTOR) + 'px';
+            playerElement.style.top = Math.ceil(fetchedCoords[1] * this.SIZE_FACTOR) + 'px';
 
         };
 
@@ -220,78 +232,91 @@
         //
         // };
 
-
         /**
          *
          * @param {gameObject} configData
          * @param {Ulti} parent
          */
-        this.initialize = function (configData, parent) {
+        this.initialize = function (configData, parent, gameMode) {
             parent.config = configData;
             // console.log(config);
             // parent.showGrid();
+            var prevButClick;
 
             parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
 
-            parent.playBut.addEventListener('click', function (evt) {
-                if (!parent._isLastStep(parent.config)) {
-                    parent.showStep(parent.config[0].game[parent.currStep]);
+            switch (gameMode) {
+                case parent.SHOW_GAME_MODE:
+
+                    parent.playBut.addEventListener('click', function playButListener (evt) {
+                        if (!parent._isLastStep(parent.config)) {
+                            parent.showStep(parent.config[0].game[parent.currStep]);
+                        }
+                    });
+
+                    parent.prevBut.addEventListener('click', prevButClick = function (evt) {
+                        parent.showPrevStep();
+                    });
+
+                    parent.clearBut.addEventListener('click', function clearButListener (evt) {
+                        parent.currStep = 0;
+                        parent.showCurrentDescription('', true);
+                        parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
+
+                        parent.writeToFile();
+                    });
+
+                    parent.fileBut.addEventListener('change', function fileButListener  (evt) {
+                        // var file = evt.target.files;
+                        var file = parent.fileBut.files;
+                        // console.log(file[0]);
+
+                        if (file[0].type !== 'application/json') {
+                            parent.showError('Please check config file');
+                            return;
+                        } else {
+                            parent.showError('', true);
+                        }
+
+                        var reader = new FileReader();
+
+                        reader.onload = function (evt) {
+                            var content = evt.target.result;
+
+                            try {
+                                var loadedData = JSON.parse(content);
+                            } catch (e) {
+                                parent.showError('Parsing error. Please, check config file!' + e.name + e.message);
+                                return;
+                            }
+                            parent.config = loadedData;
+                            parent.showCurrentDescription('', true);
+                            parent.currStep = 0;
+                            parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
+                            // console.log(content);
+                        };
+
+                        reader.onerror = function (evt) {
+                            parent.showError('Loaded file error!');
+                        };
+
+                        reader.readAsText(file[0]);
+                    }, false);
+
+                    parent.saveBut.addEventListener('click', function saveButListener  (evt) {
+                        parent.writeToFile(parent.config);
+                    });
+
+                    break;
+                case parent.EDIT_GAME_MODE :
+                    prevButClick = prevButClick ? parent.prevBut.removeEventListener(prevButClick) : prevButClick;
+
+                    parent.editBut.addEventListener('click', function(evt){
+                        parent.editGame(parent.config);
+                    });
+
+                    break;
                 }
-            });
-
-            parent.prevBut.addEventListener('click', function (evt) {
-                // debugger;
-                    parent.showPrevStep();
-            });
-
-            parent.clearBut.addEventListener('click', function (evt) {
-                parent.currStep = 0;
-                parent.showCurrentDescription('', true);
-                parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
-
-                parent.writeToFile();
-            });
-
-            parent.fileBut.addEventListener('change', function (evt) {
-                // var file = evt.target.files;
-                var file = parent.fileBut.files;
-                // console.log(file[0]);
-
-                if (file[0].type !== 'application/json') {
-                    parent.showError('Please check config file');
-                    return;
-                } else {
-                    parent.showError('', true);
-                }
-
-                var reader = new FileReader();
-
-                reader.onload = function (evt) {
-                    var content = evt.target.result;
-
-                    try {
-                        var loadedData = JSON.parse(content);
-                    } catch (e) {
-                        parent.showError('Parsing error. Please, check config file!' + e.name + e.message);
-                        return;
-                    }
-                    parent.config = loadedData;
-                    parent.showCurrentDescription('', true);
-                    parent.currStep = 0;
-                    parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
-                    // console.log(content);
-                };
-
-                reader.onerror = function (evt) {
-                    parent.showError('Loaded file error!');
-                };
-
-                reader.readAsText(file[0]);
-            }, false);
-
-            parent.saveBut.addEventListener('click', function(evt){
-                parent.writeToFile(parent.config);
-            });
 
         };
 
@@ -381,5 +406,5 @@
     var ulti = new Ulti();
 
     // ulti.loadConfig(ulti.initialize, ulti);
-    ulti.initialize(ulti.DEFAULT_CONFIG, ulti);
+    ulti.initialize(ulti.DEFAULT_CONFIG, ulti, ulti.EDIT_GAME_MODE);
 })();

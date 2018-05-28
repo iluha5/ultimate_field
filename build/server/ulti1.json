@@ -8,8 +8,8 @@
                 "speed" : 1,
                 "description": "Trata sfddf zsdf zsdf zsdf s",
                 "teamOneCoords": {
-                    "player0": [4, 44.20],
-                    "player1": [6, 0],
+                    "player0": [44, 44.20],
+                    "player1": [116, 0],
                     "player2": [6, 24.20],
                     "player3": [7, 14.80],
                     "player4": [2, 4]
