@@ -1,7 +1,16 @@
 .invisible {
+    width:1px;
+    height:1px;
     display: none;
 }
 
+.invisible-pos {
+    width:1px;
+    height:1px;
+    left:0;
+    top:0;
+    display: none;
+}
 .ulti-field {
     padding-left: 20px;
 }
@@ -54,6 +63,52 @@
 
     border: 1px solid #000;
     transition: all 1s;
+}
+
+.ulti-field__player-controls{
+    z-index: 14;
+
+    width: 25px;
+    height: 25px;
+
+    border-radius: 25px;
+
+    /*background-color: rgba(8, 16, 38, 0.04);*/
+    border: 1px solid rgba(0, 0, 0, 0.21);
+
+    transition: all 0.5s;
+}
+
+.ulti-field__player-controls-ok {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    z-index: 15;
+
+    padding: 2px;
+
+    cursor: pointer;
+    font-size: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.19);
+    background-color: rgba(191, 191, 191, 0.38);
+
+    transition: all 0.5s;
+}
+
+.ulti-field__player-controls-cancel {
+    position: absolute;
+    top:-10px;
+    right:-10px;
+    z-index: 15;
+
+    padding:2px 5px;
+
+    cursor: pointer;
+    font-size:10px;
+    border: 1px solid rgba(0, 0, 0, 0.19);
+    background-color: rgba(191, 191, 191, 0.38);
+
+    transition: all 0.5s;
 }
 
 .ulti-field__team1 {
@@ -137,6 +192,10 @@
     padding-top: 10px;
 }
 
+.ulti-field__controls-save {
+    display: none;
+}
+
 .ulti-field__controls-save-link{
     display: inline-block;
 
@@ -148,3 +207,4 @@
     border: 1px solid #6d6d6d;
     background-color: rgba(191, 191, 191, 0.38);
 }
+

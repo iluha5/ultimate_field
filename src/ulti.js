@@ -17,8 +17,8 @@
         this.FIELD_HEIGHT = 40;
         this.PLAYERS_PER_TEAM = 5;
         this.DEFAULT_COORDS_5PLAYERS = {
-            "step" : 0,
-            "speed" : 1,
+            "step": 0,
+            "speed": 1,
             "description": "This is example step. Please, load config file with the game.",
             "teamOneCoords": {
                 "player0": [6, 5],
@@ -50,8 +50,7 @@
         this.SHOW_GAME_MODE = 0;
         this.EDIT_GAME_MODE = 1;
 
-
-
+        this.gameMode = 0;
         this.currStep = 0;
         this.stepsDescr = [];
 
@@ -69,12 +68,15 @@
         this.prevBut = document.querySelector('.ulti-field__controls-prev');
         this.clearBut = document.querySelector('.ulti-field__controls-clear');
         this.fileBut = document.querySelector('.ulti-field__controls-file');
-        this.saveBut = document.querySelector('.ulti-field__controls-save');
+        // this.saveBut = document.querySelector('.ulti-field__controls-save');
         this.saveLinkBut = document.querySelector('.ulti-field__controls-save-link');
         this.editBut = document.querySelector('.ulti-field__controls-edit');
 
         // factor for transition real size of the field to pixels
         this.SIZE_FACTOR = this.fieldWidth / this.FIELD_WIDTH;
+
+        // listeners
+        this.listeners = {};
 
         /**
          * @param {Mixed} n
@@ -117,23 +119,26 @@
          * @param {Boolean} isClearAll
          */
         this.showCurrentDescription = function (descript, isClearAll) {
+            var comment = this.fetchDescription(descript);
+            var i;
+
             if (isClearAll) {
                 this.descrElement.innerHTML = '';
                 this.stepsDescr = [];
             } else {
-                descript = (this.currStep + 1) + '. ' + descript + '<br>';
-                this.stepsDescr.push(descript);
+                comment = (this.currStep + 1) + '. ' + comment + '<br><br>';
+                this.stepsDescr.push(comment);
 
                 this.descrElement.innerHTML = '';
-                for (let i = 0; i < this.stepsDescr.length; i++){
-                    this.descrElement.innerHTML =  this.stepsDescr[i] + this.descrElement.innerHTML;
+                for (i = 0; i < this.stepsDescr.length; i++) {
+                    this.descrElement.innerHTML = this.stepsDescr[i] + this.descrElement.innerHTML;
                 }
 
                 // this.descrElement.innerHTML = (this.currStep + 1) + '. ' + descript + '<br>' + this.descrElement.innerHTML;
             }
         };
 
-        this.fetchCoordsOutField = function(coords){
+        this.fetchCoordsOutField = function (coords) {
             var coordX;
             var coordY;
 
@@ -148,6 +153,33 @@
 
             return [coordX, coordY];
         };
+
+        this.isDiscCoordsCorrect = function (stepObj) {
+            // Check current disc coords
+            if ((stepObj.discOwn[0] > this.PLAYERS_PER_TEAM - 1) || (stepObj.discOwn[0] < 0) ||
+                (!this._isNumeric(stepObj.discOwn[0]) ) || (stepObj.discOwn[1] > this.PLAYERS_PER_TEAM - 1) ||
+                (stepObj.discOwn[1] < 0) || (!this._isNumeric(stepObj.discOwn[1]) )) {
+                this.showError('Wrong current disc coords. Please check config file.');
+                return false;
+            }
+
+            return true;
+
+        };
+
+        this.fetchDescription = function (string) {
+            var find = ['<', '>'];
+            var replace = ['&lt;', '&gt;'];
+            var returnString = string;
+            var regex;
+
+            for (var i = 0; i < find.length; i++) {
+                regex = new RegExp(find[i], 'g');
+                returnString = returnString.replace(regex, replace[i]);
+            }
+            return returnString;
+        };
+
 
         /**
          * Show player on the field with coords.
@@ -178,24 +210,19 @@
             var playerIndex;
             var playerWithDiscCoords;
             var team;
+            var i;
 
-            for (let i = 0; i < this.teamOneElements.length; i++) {
+            for (i = 0; i < this.teamOneElements.length; i++) {
                 playerIndex = 'player' + i;
                 this.showPlayer(this.teamOneElements[i], [stepObj.teamOneCoords[playerIndex][0], stepObj.teamOneCoords[playerIndex][1]]);
             }
 
-            for (let i = 0; i < this.teamTwoElements.length; i++) {
+            for (i = 0; i < this.teamTwoElements.length; i++) {
                 playerIndex = 'player' + i;
                 this.showPlayer(this.teamTwoElements[i], [stepObj.teamTwoCoords[playerIndex][0], stepObj.teamTwoCoords[playerIndex][1]]);
             }
 
-            // Check current disc coords
-            if ((stepObj.discOwn[0] > this.PLAYERS_PER_TEAM - 1) || (stepObj.discOwn[0] < 0) ||
-                (!this._isNumeric(stepObj.discOwn[0]) ) || (stepObj.discOwn[1] > this.PLAYERS_PER_TEAM - 1) ||
-                (stepObj.discOwn[1] < 0) || (!this._isNumeric(stepObj.discOwn[1]) )) {
-                this.showError('Wrong current disc coords. Please check config file.');
-                return;
-            }
+            if (!this.isDiscCoordsCorrect(stepObj)) return;
 
             playerIndex = 'player' + stepObj.discOwn[1];
 
@@ -217,7 +244,7 @@
 
         };
 
-        this.showPrevStep = function(){
+        this.showPrevStep = function () {
             if (this.currStep === 1) return;
             if (this.currStep > 1) {
                 this.currStep -= 2;
@@ -232,91 +259,106 @@
         //
         // };
 
+        this.removeListener = function(listener, elem){
+            listener = listener ? elem.removeEventListener(listener) : listener;
+        };
+
+        this.initShowGameListeners = function (parent, removeListeners) {
+            if (removeListeners){
+                parent.removeListener(parent.listeners.prevButClick, parent.prevBut);
+                // this.listeners.prevButClick = prevButClick ? parent.prevBut.removeEventListener(prevButClick) : prevButClick;
+            }
+
+            parent.playBut.addEventListener('click', function playButListener(evt) {
+                if (!parent._isLastStep(parent.config)) {
+                    parent.showStep(parent.config[0].game[parent.currStep]);
+                }
+            });
+
+            parent.prevBut.addEventListener('click', parent.listeners.prevButClick = function (evt) {
+                parent.showPrevStep();
+            });
+
+            parent.clearBut.addEventListener('click', function clearButListener(evt) {
+                parent.currStep = 0;
+                parent.showCurrentDescription('', true);
+                parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
+
+                parent.writeToFile(parent.config);
+            });
+
+            parent.fileBut.addEventListener('change', function fileButListener(evt) {
+                // var file = evt.target.files;
+                var file = parent.fileBut.files;
+                // console.log(file[0]);
+
+                if (file[0].type !== 'application/json') {
+                    parent.showError('Please check config file');
+                    return;
+                } else {
+                    parent.showError('', true);
+                }
+
+                var reader = new FileReader();
+
+                reader.onload = function (evt) {
+                    var content = evt.target.result;
+
+                    try {
+                        var loadedData = JSON.parse(content);
+                    } catch (e) {
+                        parent.showError('Parsing error. Please, check config file!' + e.name + e.message);
+                        return;
+                    }
+                    parent.config = loadedData;
+                    parent.showCurrentDescription('', true);
+                    parent.currStep = 0;
+                    parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
+                    // console.log(content);
+                };
+
+                reader.onerror = function (evt) {
+                    parent.showError('Loaded file error!');
+                };
+
+                reader.readAsText(file[0]);
+            }, false);
+
+            // parent.saveBut.addEventListener('click', function saveButListener(evt) {
+            //     parent.writeToFile(parent.config);
+            // });
+
+
+        };
+
         /**
          *
          * @param {gameObject} configData
          * @param {Ulti} parent
          */
         this.initialize = function (configData, parent, gameMode) {
+
             parent.config = configData;
-            // console.log(config);
-            // parent.showGrid();
-            var prevButClick;
+            parent.gameMode = gameMode;
 
-            parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
-
-            switch (gameMode) {
+            switch (parent.gameMode) {
                 case parent.SHOW_GAME_MODE:
 
-                    parent.playBut.addEventListener('click', function playButListener (evt) {
-                        if (!parent._isLastStep(parent.config)) {
-                            parent.showStep(parent.config[0].game[parent.currStep]);
-                        }
-                    });
-
-                    parent.prevBut.addEventListener('click', prevButClick = function (evt) {
-                        parent.showPrevStep();
-                    });
-
-                    parent.clearBut.addEventListener('click', function clearButListener (evt) {
-                        parent.currStep = 0;
-                        parent.showCurrentDescription('', true);
-                        parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
-
-                        parent.writeToFile();
-                    });
-
-                    parent.fileBut.addEventListener('change', function fileButListener  (evt) {
-                        // var file = evt.target.files;
-                        var file = parent.fileBut.files;
-                        // console.log(file[0]);
-
-                        if (file[0].type !== 'application/json') {
-                            parent.showError('Please check config file');
-                            return;
-                        } else {
-                            parent.showError('', true);
-                        }
-
-                        var reader = new FileReader();
-
-                        reader.onload = function (evt) {
-                            var content = evt.target.result;
-
-                            try {
-                                var loadedData = JSON.parse(content);
-                            } catch (e) {
-                                parent.showError('Parsing error. Please, check config file!' + e.name + e.message);
-                                return;
-                            }
-                            parent.config = loadedData;
-                            parent.showCurrentDescription('', true);
-                            parent.currStep = 0;
-                            parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
-                            // console.log(content);
-                        };
-
-                        reader.onerror = function (evt) {
-                            parent.showError('Loaded file error!');
-                        };
-
-                        reader.readAsText(file[0]);
-                    }, false);
-
-                    parent.saveBut.addEventListener('click', function saveButListener  (evt) {
-                        parent.writeToFile(parent.config);
-                    });
+                    parent.initShowGameListeners(parent);
+                    parent.writeToFile(parent.config);
+                    parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
 
                     break;
                 case parent.EDIT_GAME_MODE :
-                    prevButClick = prevButClick ? parent.prevBut.removeEventListener(prevButClick) : prevButClick;
 
-                    parent.editBut.addEventListener('click', function(evt){
+                    parent.editBut.addEventListener('click', function (evt) {
                         parent.editGame(parent.config);
                     });
 
                     break;
-                }
+            }
+
+
 
         };
 
@@ -326,6 +368,7 @@
          * @param {Boolean} isClear
          */
         this.showError = function (error, isClear) {
+            this.statusLineElement.innerHTML = '';
             if (isClear) {
                 this.statusLineElement.innerHTML = '';
                 return;
@@ -372,17 +415,17 @@
 
         };
 
-        this.writeToFile = function(text){
+        this.writeToFile = function (text) {
             // debugger;
-            text = text || 'Hello, world';
+            text = text || 'Something wrong. Please try again.';
 
-            var blob = new Blob([JSON.stringify(text, null, 2)], {type : 'application/json'});
+            var blob = new Blob([JSON.stringify(text, null, 2)], {type: 'application/json'});
             var url = URL.createObjectURL(blob);
             var parent = this;
 
             var reader = new FileReader();
 
-            reader.onloadend = function(){
+            reader.onloadend = function () {
                 var tagUrl = reader.result;
                 var event = new Event('click');
 
@@ -394,7 +437,7 @@
                 // parent.descrElement.innerHTML = "privet" + temp;
             };
 
-            reader.onerror = function(){
+            reader.onerror = function () {
                 parent.showError('Download error. Please, try again!');
             };
 
@@ -406,5 +449,7 @@
     var ulti = new Ulti();
 
     // ulti.loadConfig(ulti.initialize, ulti);
-    ulti.initialize(ulti.DEFAULT_CONFIG, ulti, ulti.EDIT_GAME_MODE);
+    // TODO дописать объявления для listeners
+
+    ulti.initialize(ulti.DEFAULT_CONFIG, ulti, ulti.SHOW_GAME_MODE);
 })();
