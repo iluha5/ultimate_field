@@ -71,6 +71,7 @@
         // this.saveBut = document.querySelector('.ulti-field__controls-save');
         this.saveLinkBut = document.querySelector('.ulti-field__controls-save-link');
         this.editBut = document.querySelector('.ulti-field__controls-edit');
+        this.showBut = document.querySelector('.ulti-field__controls-show');
 
         // factor for transition real size of the field to pixels
         this.SIZE_FACTOR = this.fieldWidth / this.FIELD_WIDTH;
@@ -259,17 +260,62 @@
         //
         // };
 
-        this.removeListener = function(listener, elem){
-            listener = listener ? elem.removeEventListener(listener) : listener;
+        /**
+         *
+         * @param listener
+         * @param elem
+         */
+        this.removeListener = function(listener, elem, type){
+            if (listener){
+                elem.removeEventListener(type, listener);
+            }
         };
 
-        this.initShowGameListeners = function (parent, removeListeners) {
-            if (removeListeners){
-                parent.removeListener(parent.listeners.prevButClick, parent.prevBut);
+        this.disableBut = function(but){
+            if ( (but.disabled !== 'undefined') && (!but.disabled) ){
+                but.disabled = true;
+            }
+        };
+
+
+        this.enableBut = function(but){
+            if ( (but.disabled !== 'undefined') && (but.disabled) ){
+                but.disabled = false;
+            }
+        };
+        /**
+         *
+         * @param parent
+         * @param removeListeners
+         */
+        this.initShowGameListeners = function (parent, isRemoveListeners) {
+            if (isRemoveListeners){
+                parent.removeListener(parent.listeners.prevButClick, parent.prevBut, 'click');
+                parent.disableBut(parent.prevBut);
+
+                parent.removeListener(parent.listeners.playButClick, parent.playBut, 'click');
+                parent.disableBut(parent.playBut);
+
+                parent.removeListener(parent.listeners.clearButClick, parent.clearBut, 'click');
+                parent.disableBut(parent.clearBut);
+
+                parent.removeListener(parent.listeners.fileButChange, parent.fileBut, 'change');
+                parent.disableBut(parent.fileBut);
+
+                parent.removeListener(parent.listeners.editButClick, parent.editBut, 'click');
+                parent.disableBut(parent.editBut);
+
+                return;
                 // this.listeners.prevButClick = prevButClick ? parent.prevBut.removeEventListener(prevButClick) : prevButClick;
             }
 
-            parent.playBut.addEventListener('click', function playButListener(evt) {
+            parent.enableBut(parent.prevBut);
+            parent.enableBut(parent.playBut);
+            parent.enableBut(parent.clearBut);
+            parent.enableBut(parent.fileBut);
+            parent.enableBut(parent.editBut);
+
+            parent.playBut.addEventListener('click', parent.listeners.playButClick = function playButListener(evt) {
                 if (!parent._isLastStep(parent.config)) {
                     parent.showStep(parent.config[0].game[parent.currStep]);
                 }
@@ -279,7 +325,7 @@
                 parent.showPrevStep();
             });
 
-            parent.clearBut.addEventListener('click', function clearButListener(evt) {
+            parent.clearBut.addEventListener('click', parent.listeners.clearButClick =  function clearButListener(evt) {
                 parent.currStep = 0;
                 parent.showCurrentDescription('', true);
                 parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
@@ -287,7 +333,12 @@
                 parent.writeToFile(parent.config);
             });
 
-            parent.fileBut.addEventListener('change', function fileButListener(evt) {
+            parent.editBut.addEventListener('click', parent.listeners.editButClick = function (evt) {
+                parent.initialize(parent.config, parent, parent.EDIT_GAME_MODE);
+            });
+
+
+            parent.fileBut.addEventListener('change', parent.listeners.fileButChange =  function fileButListener(evt) {
                 // var file = evt.target.files;
                 var file = parent.fileBut.files;
                 // console.log(file[0]);
@@ -331,6 +382,21 @@
 
         };
 
+        this.initEditGameListeners = function(parent, isRemoveListeners){
+            if (isRemoveListeners) {
+                parent.removeListener(parent.listeners.showButClick, parent.showBut, 'click');
+                parent.disableBut(parent.showBut);
+
+                return;
+            }
+
+            parent.enableBut(parent.showBut);
+
+            parent.showBut.addEventListener('click', parent.listeners.showButClick = function(evt){
+                parent.initialize(parent.config, parent, parent.SHOW_GAME_MODE);
+            });
+        };
+
         /**
          *
          * @param {gameObject} configData
@@ -340,20 +406,21 @@
 
             parent.config = configData;
             parent.gameMode = gameMode;
+            parent.currStep = 0;
+            parent.showCurrentDescription('', true);
 
             switch (parent.gameMode) {
                 case parent.SHOW_GAME_MODE:
-
+                    parent.initEditGameListeners(parent, true);
                     parent.initShowGameListeners(parent);
                     parent.writeToFile(parent.config);
-                    parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
+                    parent.showStep(parent.config[0].game[parent.currStep], true);
 
                     break;
                 case parent.EDIT_GAME_MODE :
-
-                    parent.editBut.addEventListener('click', function (evt) {
-                        parent.editGame(parent.config);
-                    });
+                    parent.initShowGameListeners(parent, true);
+                    parent.initEditGameListeners(parent);
+                    parent.showStep(parent.config[0].game[parent.currStep]);
 
                     break;
             }
@@ -449,7 +516,7 @@
     var ulti = new Ulti();
 
     // ulti.loadConfig(ulti.initialize, ulti);
-    // TODO дописать объявления для listeners
+    // TODO вывести список шагов в режиме редактирования
 
     ulti.initialize(ulti.DEFAULT_CONFIG, ulti, ulti.SHOW_GAME_MODE);
 })();
