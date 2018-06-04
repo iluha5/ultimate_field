@@ -1,0 +1,45 @@
+.visually-hidden(){
+    position: absolute;
+
+    width:1px;
+    height:1px;
+    margin:-1px;
+    padding:0;
+
+    border: 0;
+
+    clip: rect(0,0,0,0);
+    overflow: hidden;
+}
+
+.clearfix(){
+    &::after{
+        content: "";
+        display: table;
+        clear: both;
+    }
+}
+
+.outline(@color){
+    outline: 1px solid @color;
+}
+
+.hidden{
+    display: none;
+}
+
+.invisible {
+    width:1px;
+    height:1px;
+    display: none;
+}
+
+.invisible-pos {
+    width:1px;
+    height:1px;
+    left:0;
+    top:0;
+    display: none;
+}
+
+

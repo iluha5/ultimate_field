@@ -8,6 +8,7 @@
     function Ulti() {
         // here will be configuration from JSON file
         this.config = {};
+        this.configCopy = {};
 
         // test url
         this.CONFIG_URL = '//localhost:8080/server/ulti.json';
@@ -397,6 +398,10 @@
             });
         };
 
+        this.cloneConfig = function(config){
+            return config.slice(0);
+        };
+
         /**
          *
          * @param {gameObject} configData
@@ -421,6 +426,10 @@
                     parent.initShowGameListeners(parent, true);
                     parent.initEditGameListeners(parent);
                     parent.showStep(parent.config[0].game[parent.currStep]);
+
+                    parent.configCopy = parent.cloneConfig(parent.config);
+
+
 
                     break;
             }

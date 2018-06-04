@@ -7,7 +7,7 @@ module.exports = {
     contentBase: './build'
   },
 
-  entry: './src/main.js',
+  entry: './src/js/main.js',
 
   output: {
     filename: isDevelopmentVersion ? './js/main.js' : './build/js/main.js'
