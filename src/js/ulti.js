@@ -77,7 +77,8 @@
         // step list nodes
         this.stepList = document.querySelector('.step-list');
         this.stepTemplate = document.querySelector('#step-list__step-temp');
-        this.stepsRowTemplate = document.querySelector('#step-list__row-temp');
+        this.Team1StepsRowTemplate = document.querySelector('#step-list__team1-row-temp');
+        this.Team2StepsRowTemplate = document.querySelector('#step-list__team2-row-temp');
 
         if ('content' in this.stepTemplate) {
             this.stepToClone = this.stepTemplate.content.querySelector('.step-list__step');
@@ -85,12 +86,17 @@
             this.stepToClone = this.stepTemplate.querySelector('.step-list__step');
         }
 
-        if ('content' in this.stepsRowTemplate) {
-            this.stepRowToClone = this.stepsRowTemplate.content.querySelector('.step-list__row');
+        if ('content' in this.Team1StepsRowTemplate) {
+            this.team1StepRowToClone = this.Team1StepsRowTemplate.content.querySelector('.step-list__row');
         } else {
-            this.stepRowToClone = this.stepsRowTemplate.querySelector('.step-list__row');
+            this.team1StepRowToClone = this.Team1StepsRowTemplate.querySelector('.step-list__row');
         }
 
+        if ('content' in this.Team2StepsRowTemplate) {
+            this.team2StepRowToClone = this.Team2StepsRowTemplate.content.querySelector('.step-list__row');
+        } else {
+            this.team2StepRowToClone = this.Team2StepsRowTemplate.querySelector('.step-list__row');
+        }
 
 
         // factor for transition real size of the field to pixels
@@ -413,32 +419,50 @@
                 if (stepHeader.classList.contains('step-list__step-open')) return;
 
                 step = parent.stepList.querySelector('.step-list__step-open');
-                step.classList.remove('step-list__step-open');
+                if (step) {
+                    step.classList.remove('step-list__step-open');
+                }
 
-                stepHeader.classList.add('step-list__step-open');
-
+                stepHeader.parentElement.classList.add('step-list__step-open');
                 parent.currStep = stepNum;
 
-                parent.showStep(parent[0].game[stepNum]);
+                parent.showStep(parent.config[0].game[stepNum]);
             });
 
         };
 
         this.showEditGameSteps = function(parent){
             var step;
-            var coordsRow;
+            var team1CoordsRow;
+            var team2CoordsRow;
             var container = document.createElement('DIV');
+            var className;
 
             for (var i = 0; i < parent.config[0].game.length; i++){
                 step = parent.stepToClone.cloneNode(true);
-
                 step.querySelector('.step-list__step-number').innerHTML = 'Step ' + (i+1);
                 parent.initStepHeader(parent, step.querySelector('.step-list__step-header'), i);
-
                 step.classList.add( ('step-list__step' + i) );
+                // debugger;
+                step.querySelector('.step-list__step-comment').innerHTML = parent.config[0].game[i].description;
 
-                step.querySelector('.step-list__step-comment').value = parent.config[0].game[i].description;
-                // coordsRow = parent.stepRowToClone.cloneNode(true);
+                team1CoordsRow = parent.team1StepRowToClone.cloneNode(true);
+                team2CoordsRow = parent.team2StepRowToClone.cloneNode(true);
+
+                for (var j = 0; j < parent.PLAYERS_PER_TEAM; j++){
+                    className = '.step-list__step-team1-player' + (j + 1) + '-coordx';
+                    team1CoordsRow.querySelector(className).value = parent.config[0].game[i].teamOneCoords[('player' + j)][0];
+                    className = '.step-list__step-team1-player' + (j + 1) + '-coordy';
+                    team1CoordsRow.querySelector(className).value = parent.config[0].game[i].teamOneCoords[('player' + j)][1];
+
+                    className = '.step-list__step-team2-player' + (j + 1) + '-coordx';
+                    team2CoordsRow.querySelector(className).value = parent.config[0].game[i].teamTwoCoords[('player' + j)][0];
+                    className = '.step-list__step-team2-player' + (j + 1) + '-coordy';
+                    team2CoordsRow.querySelector(className).value = parent.config[0].game[i].teamTwoCoords[('player' + j)][1];
+                }
+
+                step.querySelector('.step-list__step-body').appendChild(team1CoordsRow);
+                step.querySelector('.step-list__step-body').appendChild(team2CoordsRow);
                 container.appendChild(step);
 
             }
@@ -493,9 +517,9 @@
                     break;
                 case parent.EDIT_GAME_MODE :
                     parent.initShowGameListeners(parent, true);
+
                     parent.initEditGameListeners(parent);
                     parent.showEditGameSteps(parent);
-
                     parent.showStep(parent.config[0].game[parent.currStep]);
 
                     parent.configCopy = parent.cloneConfig(parent.config);
