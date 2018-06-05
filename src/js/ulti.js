@@ -8,7 +8,7 @@
     function Ulti() {
         // here will be configuration from JSON file
         this.config = {};
-        this.configCopy = {};
+        this.originalConfig = {};
 
         // test url
         this.CONFIG_URL = '//localhost:8080/server/ulti.json';
@@ -408,13 +408,43 @@
 
         };
 
+        this.saveEditGameStep = function(parent, stepNum){
+            var step = document.querySelector('.step-list__step' + stepNum);
+            var className;
+// debugger;
+            parent.config[0].game[stepNum].description = step.querySelector('.step-list__step-comment').value;
+
+            for (var j = 0; j < parent.PLAYERS_PER_TEAM; j++){
+                className = '.step-list__step-team1-player' + (j + 1) + '-coordx';
+                parent.config[0].game[stepNum].teamOneCoords[('player' + j)][0] = step.querySelector(className).value;
+                className = '.step-list__step-team1-player' + (j + 1) + '-coordy';
+                parent.config[0].game[stepNum].teamOneCoords[('player' + j)][1] = step.querySelector(className).value;
+                // team1CoordsRow.querySelector(className).value = parent.config[0].game[i].teamOneCoords[('player' + j)][1];
+
+                className = '.step-list__step-team2-player' + (j + 1) + '-coordx';
+                parent.config[0].game[stepNum].teamTwoCoords[('player' + j)][0] = step.querySelector(className).value;
+                // team2CoordsRow.querySelector(className).value = parent.config[0].game[i].teamTwoCoords[('player' + j)][0];
+                className = '.step-list__step-team2-player' + (j + 1) + '-coordy';
+                parent.config[0].game[stepNum].teamTwoCoords[('player' + j)][1] = step.querySelector(className).value;
+                // team2CoordsRow.querySelector(className).value = parent.config[0].game[i].teamTwoCoords[('player' + j)][1];
+            }
+
+            parent.writeToFile(parent.config);
+        };
+
         // this.getEditGameStep = function(parent, ){
         //
         // }
 
         this.initStepHeader = function(parent, stepHeader, stepNum){
-            stepHeader.addEventListener('click', function(){
+            stepHeader.addEventListener('click', function(evt){
                 var step;
+                // var className = '.step-list__step' + stepNum;
+                // var currSaveBut = document.querySelector( (className + ' .step-list__step-save') );
+                if (evt.target.id === 'step-save'){
+                    parent.saveEditGameStep(parent, stepNum);
+                    return;
+                }
 
                 if (stepHeader.classList.contains('step-list__step-open')) return;
 
@@ -522,9 +552,7 @@
                     parent.showEditGameSteps(parent);
                     parent.showStep(parent.config[0].game[parent.currStep]);
 
-                    parent.configCopy = parent.cloneConfig(parent.config);
-
-
+                    parent.originalConfig = parent.cloneConfig(parent.config);
 
                     break;
             }
