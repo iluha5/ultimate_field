@@ -74,6 +74,25 @@
         this.editBut = document.querySelector('.ulti-field__controls-edit');
         this.showBut = document.querySelector('.ulti-field__controls-show');
 
+        // step list nodes
+        this.stepList = document.querySelector('.step-list');
+        this.stepTemplate = document.querySelector('#step-list__step-temp');
+        this.stepsRowTemplate = document.querySelector('#step-list__row-temp');
+
+        if ('content' in this.stepTemplate) {
+            this.stepToClone = this.stepTemplate.content.querySelector('.step-list__step');
+        } else {
+            this.stepToClone = this.stepTemplate.querySelector('.step-list__step');
+        }
+
+        if ('content' in this.stepsRowTemplate) {
+            this.stepRowToClone = this.stepsRowTemplate.content.querySelector('.step-list__row');
+        } else {
+            this.stepRowToClone = this.stepsRowTemplate.querySelector('.step-list__row');
+        }
+
+
+
         // factor for transition real size of the field to pixels
         this.SIZE_FACTOR = this.fieldWidth / this.FIELD_WIDTH;
 
@@ -238,7 +257,7 @@
 
             this.showDisc(playerWithDiscCoords, team);
 
-            if (!isDefault) {
+            if ( (!isDefault) && (this.gameMode !== this.EDIT_GAME_MODE) ) {
                 this.showCurrentDescription(stepObj.description, false);
                 this.currStep++;
             }
@@ -383,6 +402,54 @@
 
         };
 
+        // this.getEditGameStep = function(parent, ){
+        //
+        // }
+
+        this.initStepHeader = function(parent, stepHeader, stepNum){
+            stepHeader.addEventListener('click', function(){
+                var step;
+
+                if (stepHeader.classList.contains('step-list__step-open')) return;
+
+                step = parent.stepList.querySelector('.step-list__step-open');
+                step.classList.remove('step-list__step-open');
+
+                stepHeader.classList.add('step-list__step-open');
+
+                parent.currStep = stepNum;
+
+                parent.showStep(parent[0].game[stepNum]);
+            });
+
+        };
+
+        this.showEditGameSteps = function(parent){
+            var step;
+            var coordsRow;
+            var container = document.createElement('DIV');
+
+            for (var i = 0; i < parent.config[0].game.length; i++){
+                step = parent.stepToClone.cloneNode(true);
+
+                step.querySelector('.step-list__step-number').innerHTML = 'Step ' + (i+1);
+                parent.initStepHeader(parent, step.querySelector('.step-list__step-header'), i);
+
+                step.classList.add( ('step-list__step' + i) );
+
+                step.querySelector('.step-list__step-comment').value = parent.config[0].game[i].description;
+                // coordsRow = parent.stepRowToClone.cloneNode(true);
+                container.appendChild(step);
+
+            }
+
+            parent.stepList.appendChild(container);  //reflow
+        };
+
+        this.delEditGameSteps = function(parent){
+            parent.stepList.innerHTML = '';
+        };
+
         this.initEditGameListeners = function(parent, isRemoveListeners){
             if (isRemoveListeners) {
                 parent.removeListener(parent.listeners.showButClick, parent.showBut, 'click');
@@ -417,6 +484,8 @@
             switch (parent.gameMode) {
                 case parent.SHOW_GAME_MODE:
                     parent.initEditGameListeners(parent, true);
+                    parent.delEditGameSteps(parent);
+
                     parent.initShowGameListeners(parent);
                     parent.writeToFile(parent.config);
                     parent.showStep(parent.config[0].game[parent.currStep], true);
@@ -425,6 +494,8 @@
                 case parent.EDIT_GAME_MODE :
                     parent.initShowGameListeners(parent, true);
                     parent.initEditGameListeners(parent);
+                    parent.showEditGameSteps(parent);
+
                     parent.showStep(parent.config[0].game[parent.currStep]);
 
                     parent.configCopy = parent.cloneConfig(parent.config);
