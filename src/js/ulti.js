@@ -41,7 +41,26 @@
             {
                 "name": "default game",
                 "game": [
-                    this.DEFAULT_COORDS_5PLAYERS
+                    {
+                        "step": 0,
+                        "speed": 1,
+                        "description": "This is example step. Please, load config file with the game.",
+                        "teamOneCoords": {
+                            "player0": [6, 5],
+                            "player1": [8, 5],
+                            "player2": [10, 5],
+                            "player3": [12, 5],
+                            "player4": [14, 5]
+                        },
+                        "teamTwoCoords": {
+                            "player0": [6, 34.3],
+                            "player1": [8, 34.3],
+                            "player2": [10, 34.3],
+                            "player3": [12, 34.3],
+                            "player4": [14, 34.3]
+                        },
+                        "discOwn": [0, 1]
+                    }
                 ]
             }
         ];
@@ -224,7 +243,7 @@
 
             fetchedCoords = this.fetchCoordsOutField(coords);
 
-            if ( (coords[0] !== fetchedCoords[0]) || (coords[1] !== fetchedCoords[1]) ){
+            if ((coords[0] !== fetchedCoords[0]) || (coords[1] !== fetchedCoords[1])) {
                 this.showError('Players coordinates was fetched to the field!');
             }
 
@@ -440,12 +459,12 @@
             var step = document.querySelector('.step-list__step' + stepNum);
 
             // debugger;
-            if (parent.isLastEditGameStep(parent)){
+            if (parent.isLastEditGameStep(parent)) {
                 alert('Only one step in the game. You can\'t del it.');
                 return;
             }
 
-            if (!confirm( ('Are you sure to del step' + (stepNum + 1) + '?') ) ) {
+            if (!confirm(('Are you sure to del step' + (stepNum + 1) + '?'))) {
                 return;
             }
 
@@ -454,21 +473,55 @@
             }
 
             parent.config[0].game.splice(stepNum, 1);
+            parent.changeStepsNumeric(false, stepNum);
             parent.showEditGameSteps(parent);
 
         };
 
-        this.isLastEditGameStep = function(parent){
+        this.addEditGameStep = function (parent, stepNum) {
+            var step = document.querySelector('.step-list__step' + stepNum);
+            var newStep;
+
+            parent.config[0].game.splice((stepNum + 1), 0, parent.DEFAULT_COORDS_5PLAYERS);
+            parent.changeStepsNumeric(true, stepNum);
+            parent.currStep = stepNum + 1;
+            parent.showEditGameSteps(parent);
+
+            newStep = document.querySelector('.step-list__step' + parent.currStep);
+            newStep.classList.add('step-list__step-open');
+            // debugger;
+            parent.showStep(parent.config[0].game[parent.currStep]);
+            // parent.initStepHeader(parent,  ,(stepNum + 1))
+
+        };
+
+        this.changeStepsNumeric = function (isInsert, stepNum) {
+            var stepElem;
+            var allSteps = document.querySelectorAll('.step-list__step');
+
+            for (var i = (stepNum + 1); i < allSteps.length; i++) {
+                stepElem = document.querySelector(('.step-list__step' + i));
+                stepElem.classList.remove('step-list__step' + i);
+
+                if (isInsert) {
+                    stepElem.classList.add('step-list__step' + (i + 1));
+                } else {
+                    stepElem.classList.add('step-list__step' + (i - 1));
+                }
+            }
+        };
+
+        this.isLastEditGameStep = function (parent) {
             return (parent.config[0].game.length <= 1);
         };
 
-        this.changePlayerCoords = function(newCoords, player, parent){
+        this.changePlayerCoords = function (newCoords, player, parent) {
             var team = player[0] ? 'teamTwoCoords' : 'teamOneCoords';
             var playerString = 'player' + player[1];
             parent.config[0].game[parent.currStep][team][playerString] = newCoords;
         };
 
-        this.getOffsetRect = function(elem) {
+        this.getOffsetRect = function (elem) {
             var box = elem.getBoundingClientRect();
             var body = document.body;
             var docElem = document.documentElement;
@@ -479,10 +532,10 @@
             var clientTop = docElem.clientTop || body.clientTop || 0;
             var clientLeft = docElem.clientLeft || body.clientLeft || 0;
 
-            var top  = box.top +  scrollTop - clientTop;
+            var top = box.top + scrollTop - clientTop;
             var left = box.left + scrollLeft - clientLeft;
 
-            return { top: Math.round(top), left: Math.round(left) };
+            return {top: Math.round(top), left: Math.round(left)};
         };
 
 
@@ -495,14 +548,14 @@
             ];
         };
 
-        this.movePlayerToCoords = function(player, playerElem, mouseCoords, parent){
+        this.movePlayerToCoords = function (player, playerElem, mouseCoords, parent) {
             if (!playerElem) return;
 
             var fetchedMouseCoords = parent.fetchMouseCorrdsToField(mouseCoords, parent);
 
             var newPlayerCoords = [
-                parseFloat( (fetchedMouseCoords[0] / parent.SIZE_FACTOR).toFixed(2) ),
-                parseFloat( (fetchedMouseCoords[1] / parent.SIZE_FACTOR).toFixed(2) )
+                parseFloat((fetchedMouseCoords[0] / parent.SIZE_FACTOR).toFixed(2)),
+                parseFloat((fetchedMouseCoords[1] / parent.SIZE_FACTOR).toFixed(2))
             ];
 
             var fetchedPlayerCoords = parent.fetchCoordsOutField(newPlayerCoords);
@@ -514,11 +567,11 @@
 
         };
 
-        this.isClickOnPlayer = function(target, parent){
+        this.isClickOnPlayer = function (target, parent) {
             for (var j = 0; j < 2; j++) {
                 for (var i = 0; i < parent.PLAYERS_PER_TEAM; i++) {
-                    if (target.classList.contains( ('ulti-field__player' + ( j + 1 ) + '-' + ( i + 1) ) ) ) {
-                        return [j,i];
+                    if (target.classList.contains(('ulti-field__player' + ( j + 1 ) + '-' + ( i + 1) ))) {
+                        return [j, i];
                     }
                 }
             }
@@ -530,13 +583,13 @@
         this.initEditGameFieldListeners = function (parent) {
             var ultiField = document.querySelector('.ulti-field__container');
 
-            ultiField.addEventListener('click', parent.ultiFieldOnClick = function(evt){
+            ultiField.addEventListener('click', parent.ultiFieldOnClick = function (evt) {
                 // debugger;
                 var playerCoords;
                 var playerInConfigElem = document.querySelector('.ulti-field__player-in-config');
 
 // debugger;
-                if (playerInConfigElem && parent.playerInConfig && !parent.isClickOnPlayer(evt.target, parent) ){
+                if (playerInConfigElem && parent.playerInConfig && !parent.isClickOnPlayer(evt.target, parent)) {
                     parent.movePlayerToCoords(parent.playerInConfig, playerInConfigElem, [evt.pageX, evt.pageY], parent);
                     parent.playerInConfig = undefined;
                     playerInConfigElem.classList.remove('ulti-field__player-in-config');
@@ -560,12 +613,19 @@
                 // var className = '.step-list__step' + stepNum;
                 // var currSaveBut = document.querySelector( (className + ' .step-list__step-save') );
                 if (evt.target.id === 'step-save') {
+                    debugger;
                     parent.saveEditGameStep(parent, stepNum);
                     return;
                 }
 
                 if (evt.target.id === 'step-del') {
                     parent.delEditGameStep(parent, stepNum);
+                    return;
+                }
+// debugger;
+                if (evt.target.id === 'step-add') {
+                    debugger;
+                    parent.addEditGameStep(parent, stepNum);
                     return;
                 }
 
@@ -586,8 +646,12 @@
 
         };
 
+        this.initStepBody = function (stepBody, parent) {
+
+        };
+
         this.showCurrStepCoords = function (parent) {
-            var stepElem = document.querySelector( ('.step-list__step' + parent.currStep) );
+            var stepElem = document.querySelector(('.step-list__step' + parent.currStep));
             var className;
 // debugger;
             for (var i = 0; i < parent.PLAYERS_PER_TEAM; i++) {
@@ -615,9 +679,10 @@
             for (var i = 0; i < parent.config[0].game.length; i++) {
                 step = parent.stepToClone.cloneNode(true);
                 step.querySelector('.step-list__step-number').innerHTML = 'Step ' + (i + 1);
+
                 parent.initStepHeader(parent, step.querySelector('.step-list__step-header'), i);
+
                 step.classList.add(('step-list__step' + i));
-                // debugger;
                 step.querySelector('.step-list__step-comment').innerHTML = parent.config[0].game[i].description;
 
                 team1CoordsRow = parent.team1StepRowToClone.cloneNode(true);
@@ -637,6 +702,9 @@
 
                 step.querySelector('.step-list__step-body').appendChild(team1CoordsRow);
                 step.querySelector('.step-list__step-body').appendChild(team2CoordsRow);
+
+                // parent.initStepBody(step.querySelector('.step-list__step-body'), parent);
+
                 container.appendChild(step);
 
             }
@@ -674,7 +742,7 @@
          */
         this.initialize = function (configData, parent, gameMode) {
 
-            parent.config = configData;
+            parent.config = configData.slice(0);
             parent.gameMode = gameMode;
             parent.currStep = 0;
             parent.showCurrentDescription('', true);
