@@ -509,12 +509,12 @@
 
             parent.changePlayerCoords(fetchedPlayerCoords, player, parent);
             parent.showStep(parent.config[0].game[parent.currStep]);
-            // parent.updatePlayersCoords();
+            parent.showCurrStepCoords(parent);
 
 
         };
 
-        this.isClickOnPlayer = function(parent, target){
+        this.isClickOnPlayer = function(target, parent){
             for (var j = 0; j < 2; j++) {
                 for (var i = 0; i < parent.PLAYERS_PER_TEAM; i++) {
                     if (target.classList.contains( ('ulti-field__player' + ( j + 1 ) + '-' + ( i + 1) ) ) ) {
@@ -534,14 +534,20 @@
                 // debugger;
                 var playerCoords;
                 var playerInConfigElem = document.querySelector('.ulti-field__player-in-config');
-                if (playerInConfigElem && parent.playerInConfig && !parent.isClickOnPlayer(evt.target) ){
+
+// debugger;
+                if (playerInConfigElem && parent.playerInConfig && !parent.isClickOnPlayer(evt.target, parent) ){
                     parent.movePlayerToCoords(parent.playerInConfig, playerInConfigElem, [evt.pageX, evt.pageY], parent);
                     parent.playerInConfig = undefined;
                     playerInConfigElem.classList.remove('ulti-field__player-in-config');
                 }
 
-                playerCoords = parent.isClickOnPlayer(parent, evt.target);
+                playerCoords = parent.isClickOnPlayer(evt.target, parent);
                 if (playerCoords) {
+                    if (playerInConfigElem) {
+                        playerInConfigElem.classList.remove('ulti-field__player-in-config');
+                    }
+
                     evt.target.classList.add('ulti-field__player-in-config');
                     parent.playerInConfig = playerCoords;
                 }
@@ -578,6 +584,23 @@
                 parent.showStep(parent.config[0].game[stepNum]);
             });
 
+        };
+
+        this.showCurrStepCoords = function (parent) {
+            var stepElem = document.querySelector( ('.step-list__step' + parent.currStep) );
+            var className;
+// debugger;
+            for (var i = 0; i < parent.PLAYERS_PER_TEAM; i++) {
+                className = '.step-list__step-team1-player' + (i + 1) + '-coordx';
+                stepElem.querySelector(className).value = parent.config[0].game[parent.currStep].teamOneCoords[('player' + i)][0];
+                className = '.step-list__step-team1-player' + (i + 1) + '-coordy';
+                stepElem.querySelector(className).value = parent.config[0].game[parent.currStep].teamOneCoords[('player' + i)][1];
+
+                className = '.step-list__step-team2-player' + (i + 1) + '-coordx';
+                stepElem.querySelector(className).value = parent.config[0].game[parent.currStep].teamTwoCoords[('player' + i)][0];
+                className = '.step-list__step-team2-player' + (i + 1) + '-coordy';
+                stepElem.querySelector(className).value = parent.config[0].game[parent.currStep].teamTwoCoords[('player' + i)][1];
+            }
         };
 
         this.showEditGameSteps = function (parent) {
