@@ -441,6 +441,12 @@ template {
   border-radius: 10px;
   border: 1px solid #000;
   transition: all 1s;
+  cursor: pointer;
+  font-size: 10px;
+  line-height: 10px;
+  vertical-align: middle;
+  text-align: center;
+  color: #fff;
 }
 .ulti-field__player-controls {
   z-index: 34;
@@ -561,6 +567,7 @@ template {
   padding: 10px;
   width: 100%;
   border: 1px solid #838383;
+  cursor: pointer;
 }
 .step-list__step-header--not-saved {
   background-color: rgba(255, 64, 18, 0.44);

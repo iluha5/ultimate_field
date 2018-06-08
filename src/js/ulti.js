@@ -6,6 +6,7 @@
     'use strict';
 
     function Ulti() {
+        // this.parent = this;
         // here will be configuration from JSON file
         this.config = {};
         this.originalConfig = {};
@@ -20,7 +21,7 @@
         this.DEFAULT_COORDS_5PLAYERS = {
             "step": 0,
             "speed": 1,
-            "description": "This is example step. Please, load config file with the game.",
+            "description": "This is example step. Change it or load config file with the game.",
             "teamOneCoords": {
                 "player0": [6, 5],
                 "player1": [8, 5],
@@ -364,65 +365,75 @@
             parent.enableBut(parent.fileBut);
             parent.enableBut(parent.editBut);
 
-            parent.playBut.addEventListener('click', parent.listeners.playButClick = function playButListener(evt) {
-                if (!parent._isLastStep(parent.config)) {
-                    parent.showStep(parent.config[0].game[parent.currStep]);
-                }
-            });
-
-            parent.prevBut.addEventListener('click', parent.listeners.prevButClick = function (evt) {
-                parent.showPrevStep();
-            });
-
-            parent.clearBut.addEventListener('click', parent.listeners.clearButClick = function clearButListener(evt) {
-                parent.currStep = 0;
-                parent.showCurrentDescription('', true);
-                parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
-
-                parent.writeToFile(parent.config);
-            });
-
-            parent.editBut.addEventListener('click', parent.listeners.editButClick = function (evt) {
-                parent.initialize(parent.config, parent, parent.EDIT_GAME_MODE);
-            });
-
-
-            parent.fileBut.addEventListener('change', parent.listeners.fileButChange = function fileButListener(evt) {
-                // var file = evt.target.files;
-                var file = parent.fileBut.files;
-                // console.log(file[0]);
-
-                if (file[0].type !== 'application/json') {
-                    parent.showError('Please check config file');
-                    return;
-                } else {
-                    parent.showError('', true);
-                }
-
-                var reader = new FileReader();
-
-                reader.onload = function (evt) {
-                    var content = evt.target.result;
-
-                    try {
-                        var loadedData = JSON.parse(content);
-                    } catch (e) {
-                        parent.showError('Parsing error. Please, check config file!' + e.name + e.message);
-                        return;
+            if (!parent.listeners.playButClick) {
+                parent.playBut.addEventListener('click', parent.listeners.playButClick = function playButListener(evt) {
+                    if (!parent._isLastStep(parent.config)) {
+                        parent.showStep(parent.config[0].game[parent.currStep]);
                     }
-                    parent.config = loadedData;
-                    parent.showCurrentDescription('', true);
+                });
+            }
+
+            if (!parent.listeners.prevButClick) {
+                parent.prevBut.addEventListener('click', parent.listeners.prevButClick = function (evt) {
+                    parent.showPrevStep();
+                });
+            }
+
+            if (!parent.listeners.clearButClick) {
+                parent.clearBut.addEventListener('click', parent.listeners.clearButClick = function clearButListener(evt) {
                     parent.currStep = 0;
+                    parent.showCurrentDescription('', true);
                     parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
-                    // console.log(content);
-                };
 
-                reader.onerror = function (evt) {
-                    parent.showError('Loaded file error!');
-                };
+                    parent.writeToFile(parent.config);
+                });
+            }
 
-                reader.readAsText(file[0]);
-            }, false);
+            if (!parent.listeners.editButClick) {
+                parent.editBut.addEventListener('click', parent.listeners.editButClick = function (evt) {
+                    parent.initialize(parent.config, parent, parent.EDIT_GAME_MODE);
+                });
+            }
+
+
+            if (!parent.listeners.fileButChange) {
+                parent.fileBut.addEventListener('change', parent.listeners.fileButChange = function fileButListener(evt) {
+                    // var file = evt.target.files;
+                    var file = parent.fileBut.files;
+                    // console.log(file[0]);
+
+                    if (file[0].type !== 'application/json') {
+                        parent.showError('Please check config file');
+                        return;
+                    } else {
+                        parent.showError('', true);
+                    }
+
+                    var reader = new FileReader();
+
+                    reader.onload = function (evt) {
+                        var content = evt.target.result;
+
+                        try {
+                            var loadedData = JSON.parse(content);
+                        } catch (e) {
+                            parent.showError('Parsing error. Please, check config file!' + e.name + e.message);
+                            return;
+                        }
+                        parent.config = loadedData;
+                        parent.showCurrentDescription('', true);
+                        parent.currStep = 0;
+                        parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
+                        // console.log(content);
+                    };
+
+                    reader.onerror = function (evt) {
+                        parent.showError('Loaded file error!');
+                    };
+
+                    reader.readAsText(file[0]);
+                }, false);
+            }
 
             // parent.saveBut.addEventListener('click', function saveButListener(evt) {
             //     parent.writeToFile(parent.config);
@@ -591,6 +602,7 @@
 // debugger;
                 if (playerInConfigElem && parent.playerInConfig && !parent.isClickOnPlayer(evt.target, parent)) {
                     parent.movePlayerToCoords(parent.playerInConfig, playerInConfigElem, [evt.pageX, evt.pageY], parent);
+                    parent.saveEditGameStep(parent, parent.currStep);
                     parent.playerInConfig = undefined;
                     playerInConfigElem.classList.remove('ulti-field__player-in-config');
                 }
@@ -610,21 +622,18 @@
         this.initStepHeader = function (parent, stepHeader, stepNum) {
             stepHeader.addEventListener('click', function (evt) {
                 var step;
-                // var className = '.step-list__step' + stepNum;
-                // var currSaveBut = document.querySelector( (className + ' .step-list__step-save') );
-                if (evt.target.id === 'step-save') {
-                    debugger;
-                    parent.saveEditGameStep(parent, stepNum);
-                    return;
-                }
+
+                // if (evt.target.id === 'step-save') {
+                //     parent.saveEditGameStep(parent, stepNum);
+                //     return;
+                // }
 
                 if (evt.target.id === 'step-del') {
                     parent.delEditGameStep(parent, stepNum);
                     return;
                 }
-// debugger;
+
                 if (evt.target.id === 'step-add') {
-                    debugger;
                     parent.addEditGameStep(parent, stepNum);
                     return;
                 }
@@ -646,14 +655,43 @@
 
         };
 
-        this.initStepBody = function (stepBody, parent) {
+        this.initStepBodyListener = function (parent, elem, stepNum) {
 
+            elem.addEventListener('change', function (evt) {
+                var className = this.classList[1];
+                var axis = className[className.length - 1];
+                var playerNum = className.replace(/\D+/g,'') + '';
+                var team = (playerNum[0] === '2') ? 'teamTwoCoords' : 'teamOneCoords';
+                var player = 'player' + (+playerNum[1] - 1);
+
+                // debugger;
+                if ( !parent._isNumeric(this.value) ){
+                    parent.showError('Not a number inputed!');
+                    return;
+                }
+
+                if (axis === 'x') {
+                    parent.config[0].game[parent.currStep][team][player][0] = +this.value;
+                }
+
+                if (axis === 'y') {
+                    parent.config[0].game[parent.currStep][team][player][1] = +this.value;
+                }
+
+                parent.showStep(parent.config[0].game[parent.currStep]);
+
+                // var header = this.parentNode.parentNode.parentNode.parentNode.parentNode;
+
+                // if (header.classList.contains('step-list__step-header--not-saved')) return;
+                //
+                // header.classList.add('step-list__step-header--not-saved');
+            });
         };
 
         this.showCurrStepCoords = function (parent) {
             var stepElem = document.querySelector(('.step-list__step' + parent.currStep));
             var className;
-// debugger;
+
             for (var i = 0; i < parent.PLAYERS_PER_TEAM; i++) {
                 className = '.step-list__step-team1-player' + (i + 1) + '-coordx';
                 stepElem.querySelector(className).value = parent.config[0].game[parent.currStep].teamOneCoords[('player' + i)][0];
@@ -685,23 +723,36 @@
                 step.classList.add(('step-list__step' + i));
                 step.querySelector('.step-list__step-comment').innerHTML = parent.config[0].game[i].description;
 
+                parent.currHeader = step.querySelector('.step-list__step-header');
+
+
+                parent.initStepBodyListener(parent, step.querySelector('.step-list__step-comment'), i);
+
                 team1CoordsRow = parent.team1StepRowToClone.cloneNode(true);
                 team2CoordsRow = parent.team2StepRowToClone.cloneNode(true);
 
                 for (var j = 0; j < parent.PLAYERS_PER_TEAM; j++) {
                     className = '.step-list__step-team1-player' + (j + 1) + '-coordx';
                     team1CoordsRow.querySelector(className).value = parent.config[0].game[i].teamOneCoords[('player' + j)][0];
+                    parent.initStepBodyListener(parent, team1CoordsRow.querySelector(className), i);
+
                     className = '.step-list__step-team1-player' + (j + 1) + '-coordy';
                     team1CoordsRow.querySelector(className).value = parent.config[0].game[i].teamOneCoords[('player' + j)][1];
+                    parent.initStepBodyListener(parent, team1CoordsRow.querySelector(className), i);
 
                     className = '.step-list__step-team2-player' + (j + 1) + '-coordx';
                     team2CoordsRow.querySelector(className).value = parent.config[0].game[i].teamTwoCoords[('player' + j)][0];
+                    parent.initStepBodyListener(parent, team2CoordsRow.querySelector(className), i);
+
                     className = '.step-list__step-team2-player' + (j + 1) + '-coordy';
                     team2CoordsRow.querySelector(className).value = parent.config[0].game[i].teamTwoCoords[('player' + j)][1];
+                    parent.initStepBodyListener(parent, team2CoordsRow.querySelector(className), i);
                 }
 
                 step.querySelector('.step-list__step-body').appendChild(team1CoordsRow);
                 step.querySelector('.step-list__step-body').appendChild(team2CoordsRow);
+
+                // parent.initStepBody(parent, step.querySelector('.step-list__step-body'), i);
 
                 // parent.initStepBody(step.querySelector('.step-list__step-body'), parent);
 
@@ -726,13 +777,25 @@
 
             parent.enableBut(parent.showBut);
 
-            parent.showBut.addEventListener('click', parent.listeners.showButClick = function (evt) {
-                parent.initialize(parent.config, parent, parent.SHOW_GAME_MODE);
-            });
+            if (!parent.listeners.showButClick) {
+                parent.showBut.addEventListener('click', parent.listeners.showButClick = function (evt) {
+                    parent.initialize(parent.config, parent, parent.SHOW_GAME_MODE);
+                });
+            }
         };
 
         this.cloneConfig = function (config) {
             return config.slice(0);
+        };
+
+        this.initLoadTestConfig = function (parent) {
+            var link = document.querySelector('.ulti-field__test-config');
+
+            if (parent.listeners.loadTestConfigListener) return;
+
+            link.addEventListener('click', parent.listeners.loadTestConfigListener = function () {
+               parent.loadConfig(parent.initialize, parent);
+            });
         };
 
         /**
@@ -746,6 +809,7 @@
             parent.gameMode = gameMode;
             parent.currStep = 0;
             parent.showCurrentDescription('', true);
+            parent.initLoadTestConfig(parent);
 
             switch (parent.gameMode) {
                 case parent.SHOW_GAME_MODE:
@@ -805,7 +869,7 @@
                         return;
                     }
 
-                    callback(loadedData, parent);
+                    callback(loadedData, parent, parent.SHOW_GAME_MODE);
                 } else {
                     parent.showError('Server error');
                 }
@@ -820,7 +884,7 @@
                 parent.showError('TimeOut');
             };
 
-            xhr.open('GET', this.CONFIG_URL);
+            xhr.open('GET', parent.CONFIG_URL);
             xhr.send();
 
         };
