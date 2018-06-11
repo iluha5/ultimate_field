@@ -365,75 +365,83 @@
             parent.enableBut(parent.fileBut);
             parent.enableBut(parent.editBut);
 
-            if (!parent.listeners.playButClick) {
-                parent.playBut.addEventListener('click', parent.listeners.playButClick = function playButListener(evt) {
-                    if (!parent._isLastStep(parent.config)) {
-                        parent.showStep(parent.config[0].game[parent.currStep]);
-                    }
-                });
+            // debugger;
+
+            if (parent.listeners.playButClick) {
+                parent.removeListener(parent.listeners.playButClick, parent.playBut, 'click');
             }
+            parent.playBut.addEventListener('click', parent.listeners.playButClick = function playButListener(evt) {
+                if (!parent._isLastStep(parent.config)) {
+                    parent.showStep(parent.config[0].game[parent.currStep]);
+                }
+            });
 
-            if (!parent.listeners.prevButClick) {
-                parent.prevBut.addEventListener('click', parent.listeners.prevButClick = function (evt) {
-                    parent.showPrevStep();
-                });
+            if (parent.listeners.prevButClick) {
+                parent.removeListener(parent.listeners.prevButClick, parent.prevBut, 'click');
             }
+            parent.prevBut.addEventListener('click', parent.listeners.prevButClick = function (evt) {
+                parent.showPrevStep();
+            });
 
-            if (!parent.listeners.clearButClick) {
-                parent.clearBut.addEventListener('click', parent.listeners.clearButClick = function clearButListener(evt) {
-                    parent.currStep = 0;
-                    parent.showCurrentDescription('', true);
-                    parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
 
-                    parent.writeToFile(parent.config);
-                });
+            if (parent.listeners.clearButClick) {
+                parent.removeListener(parent.listeners.clearButClick, parent.clearBut, 'click');
             }
+            parent.clearBut.addEventListener('click', parent.listeners.clearButClick = function clearButListener(evt) {
+                parent.currStep = 0;
+                parent.showCurrentDescription('', true);
+                parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
 
-            if (!parent.listeners.editButClick) {
-                parent.editBut.addEventListener('click', parent.listeners.editButClick = function (evt) {
-                    parent.initialize(parent.config, parent, parent.EDIT_GAME_MODE);
-                });
+                parent.writeToFile(parent.config);
+            });
+
+            if (parent.listeners.editButClick) {
+                parent.removeListener(parent.listeners.editButClick, parent.editBut, 'click');
             }
+            parent.editBut.addEventListener('click', parent.listeners.editButClick = function (evt) {
+                parent.initialize(parent.config, parent, parent.EDIT_GAME_MODE);
+            });
 
 
-            if (!parent.listeners.fileButChange) {
-                parent.fileBut.addEventListener('change', parent.listeners.fileButChange = function fileButListener(evt) {
-                    // var file = evt.target.files;
-                    var file = parent.fileBut.files;
-                    // console.log(file[0]);
+            if (parent.listeners.fileButChange) {
+                parent.removeListener(parent.listeners.fileButChange, parent.fileBut, 'click');
+            }
+            parent.fileBut.addEventListener('change', parent.listeners.fileButChange = function fileButListener(evt) {
+                // var file = evt.target.files;
+                var file = parent.fileBut.files;
+                // console.log(file[0]);
 
-                    if (file[0].type !== 'application/json') {
-                        parent.showError('Please check config file');
+                if (file[0].type !== 'application/json') {
+                    parent.showError('Please check config file');
+                    return;
+                } else {
+                    parent.showError('', true);
+                }
+
+                var reader = new FileReader();
+
+                reader.onload = function (evt) {
+                    var content = evt.target.result;
+
+                    try {
+                        var loadedData = JSON.parse(content);
+                    } catch (e) {
+                        parent.showError('Parsing error. Please, check config file!' + e.name + e.message);
                         return;
-                    } else {
-                        parent.showError('', true);
                     }
+                    parent.config = loadedData;
+                    parent.showCurrentDescription('', true);
+                    parent.currStep = 0;
+                    parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
+                    // console.log(content);
+                };
 
-                    var reader = new FileReader();
+                reader.onerror = function (evt) {
+                    parent.showError('Loaded file error!');
+                };
 
-                    reader.onload = function (evt) {
-                        var content = evt.target.result;
-
-                        try {
-                            var loadedData = JSON.parse(content);
-                        } catch (e) {
-                            parent.showError('Parsing error. Please, check config file!' + e.name + e.message);
-                            return;
-                        }
-                        parent.config = loadedData;
-                        parent.showCurrentDescription('', true);
-                        parent.currStep = 0;
-                        parent.showStep(parent.DEFAULT_COORDS_5PLAYERS, true);
-                        // console.log(content);
-                    };
-
-                    reader.onerror = function (evt) {
-                        parent.showError('Loaded file error!');
-                    };
-
-                    reader.readAsText(file[0]);
-                }, false);
-            }
+                reader.readAsText(file[0]);
+            }, false);
 
             // parent.saveBut.addEventListener('click', function saveButListener(evt) {
             //     parent.writeToFile(parent.config);
@@ -591,10 +599,27 @@
 
         };
 
-        this.initEditGameFieldListeners = function (parent) {
+        this.initEditGameFieldListeners = function (parent, isClear) {
             var ultiField = document.querySelector('.ulti-field__container');
+            var currPlayerInConfigElem = document.querySelector('.ulti-field__player-in-config');
 
-            ultiField.addEventListener('click', parent.ultiFieldOnClick = function (evt) {
+            if (isClear) {
+                if (currPlayerInConfigElem) {
+                    currPlayerInConfigElem.classList.remove('ulti-field__player-in-config');
+                    parent.playerInConfig = undefined;
+                }
+
+                if (!parent.listeners.ultiFieldOnClick) return;
+
+                parent.removeListener(parent.listeners.ultiFieldOnClick, ultiField, 'click');
+                return;
+            }
+
+            if (parent.listeners.ultiFieldOnClick) {
+                parent.removeListener(parent.listeners.ultiFieldOnClick, ultiField, 'click');
+            }
+
+            ultiField.addEventListener('click', parent.listeners.ultiFieldOnClick = function (evt) {
                 // debugger;
                 var playerCoords;
                 var playerInConfigElem = document.querySelector('.ulti-field__player-in-config');
@@ -660,12 +685,12 @@
             elem.addEventListener('change', function (evt) {
                 var className = this.classList[1];
                 var axis = className[className.length - 1];
-                var playerNum = className.replace(/\D+/g,'') + '';
+                var playerNum = className.replace(/\D+/g, '') + '';
                 var team = (playerNum[0] === '2') ? 'teamTwoCoords' : 'teamOneCoords';
                 var player = 'player' + (+playerNum[1] - 1);
 
                 // debugger;
-                if ( !parent._isNumeric(this.value) ){
+                if (!parent._isNumeric(this.value)) {
                     parent.showError('Not a number inputed!');
                     return;
                 }
@@ -777,11 +802,11 @@
 
             parent.enableBut(parent.showBut);
 
-            if (!parent.listeners.showButClick) {
-                parent.showBut.addEventListener('click', parent.listeners.showButClick = function (evt) {
-                    parent.initialize(parent.config, parent, parent.SHOW_GAME_MODE);
-                });
-            }
+            // if (!parent.listeners.showButClick) {
+            parent.showBut.addEventListener('click', parent.listeners.showButClick = function (evt) {
+                parent.initialize(parent.config, parent, parent.SHOW_GAME_MODE);
+            });
+            // }
         };
 
         this.cloneConfig = function (config) {
@@ -794,7 +819,7 @@
             if (parent.listeners.loadTestConfigListener) return;
 
             link.addEventListener('click', parent.listeners.loadTestConfigListener = function () {
-               parent.loadConfig(parent.initialize, parent);
+                parent.loadConfig(parent.initialize, parent);
             });
         };
 
@@ -813,12 +838,15 @@
 
             switch (parent.gameMode) {
                 case parent.SHOW_GAME_MODE:
+                    parent.initEditGameFieldListeners(parent, true);
                     parent.initEditGameListeners(parent, true);
                     parent.delEditGameSteps(parent);
 
                     parent.initShowGameListeners(parent);
                     parent.writeToFile(parent.config);
                     parent.showStep(parent.config[0].game[parent.currStep], true);
+
+                    // debugger;
 
                     break;
                 case parent.EDIT_GAME_MODE :
