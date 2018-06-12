@@ -515,6 +515,10 @@ template {
   background-color: #fff;
   transition: all 1s;
 }
+.ulti-field__disc-in-config {
+  background-color: green;
+  border: 1px solid green;
+}
 .ulti-field__status-line {
   height: 20px;
   width: 300px;

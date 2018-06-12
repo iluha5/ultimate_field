@@ -12,7 +12,7 @@
         this.originalConfig = {};
 
         // test url
-        this.CONFIG_URL = '//localhost:8080/server/ulti.json';
+        this.CONFIG_URL = 'server/ulti.json';
 
         // real sizes of the playing field in meters
         this.FIELD_WIDTH = 20;
@@ -75,6 +75,7 @@
         this.currStep = 0;
         this.stepsDescr = [];
         this.playerInConfig = undefined;
+        this.discInConfig = undefined;
 
         this.statusLineElement = document.querySelector('.ulti-field__status-line');
         this.descrElement = document.querySelector('.ulti-field__descript-body');
@@ -510,9 +511,9 @@
 
             newStep = document.querySelector('.step-list__step' + parent.currStep);
             newStep.classList.add('step-list__step-open');
-            // debugger;
+
+            parent.initEditGameFieldListeners(parent);
             parent.showStep(parent.config[0].game[parent.currStep]);
-            // parent.initStepHeader(parent,  ,(stepNum + 1))
 
         };
 
@@ -569,6 +570,7 @@
             ];
         };
 
+
         this.movePlayerToCoords = function (player, playerElem, mouseCoords, parent) {
             if (!playerElem) return;
 
@@ -588,6 +590,12 @@
 
         };
 
+        this.moveDiscToPlayer = function (playerNum, parent) {
+            parent.config[0].game[parent.currStep].discOwn = playerNum;
+            parent.showStep(parent.config[0].game[parent.currStep]);
+            parent.showCurrStepCoords(parent);
+        };
+
         this.isClickOnPlayer = function (target, parent) {
             for (var j = 0; j < 2; j++) {
                 for (var i = 0; i < parent.PLAYERS_PER_TEAM; i++) {
@@ -601,7 +609,11 @@
 
         };
 
-        this.clearPlayerInConfig = function(parent){
+        this.isClickOnDisc = function (target) {
+            return target.classList.contains('ulti-field__disc');
+        };
+
+        this.clearPlayerInConfig = function (parent) {
             var currPlayerInConfigElem = document.querySelector('.ulti-field__player-in-config');
 
             if (currPlayerInConfigElem) {
@@ -633,11 +645,25 @@
             }
 
             ultiField.addEventListener('click', parent.listeners.ultiFieldOnClick = function (evt) {
-                // debugger;
                 var playerCoords;
                 var playerInConfigElem = document.querySelector('.ulti-field__player-in-config');
-
+                var discInConfigElem = document.querySelector('.ulti-field__disc-in-config');
+                var discElem = document.querySelector('.ulti-field__disc');
 // debugger;
+                if (discInConfigElem && parent.discInConfig && parent.isClickOnPlayer(evt.target, parent)) {
+                    parent.moveDiscToPlayer(parent.isClickOnPlayer(evt.target, parent), parent);
+                    parent.saveEditGameStep(parent, parent.currStep);
+                    parent.discInConfig = undefined;
+                    discInConfigElem.classList.remove('ulti-field__disc-in-config');
+                    return;
+                }
+
+                if (parent.isClickOnDisc(evt.target) && !discInConfigElem && !parent.discInConfig) {
+                    parent.discInConfig = true;
+                    discElem.classList.add('ulti-field__disc-in-config');
+                }
+
+
                 if (playerInConfigElem && parent.playerInConfig && !parent.isClickOnPlayer(evt.target, parent)) {
                     parent.movePlayerToCoords(parent.playerInConfig, playerInConfigElem, [evt.pageX, evt.pageY], parent);
                     parent.saveEditGameStep(parent, parent.currStep);
@@ -660,12 +686,7 @@
         this.initStepHeader = function (parent, stepHeader, stepNum) {
             stepHeader.addEventListener('click', function (evt) {
                 var step;
-
-                // if (evt.target.id === 'step-save') {
-                //     parent.saveEditGameStep(parent, stepNum);
-                //     return;
-                // }
-
+// debugger;
                 if (evt.target.id === 'step-del') {
                     parent.clearPlayerInConfig(parent);
                     parent.delEditGameStep(parent, stepNum);
@@ -828,7 +849,7 @@
         this.cloneConfig = function (obj) {
             var clone = {};
             for (var i in obj) {
-                if (typeof (obj[i]) == "object" && obj[i] != null) {
+                if (typeof (obj[i]) === "object" && obj[i] !== null) {
                     clone[i] = this.cloneConfig(obj[i]);
                 }
                 else {

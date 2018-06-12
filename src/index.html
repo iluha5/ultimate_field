@@ -22,30 +22,31 @@
 
         <div class="ulti-field__zone  ulti-field__zone1"></div>
 
-        <div class="ulti-field__player  ulti-field__team1  ulti-field__player1-1"></div>
-        <div class="ulti-field__player  ulti-field__team1  ulti-field__player1-2"></div>
-        <div class="ulti-field__player  ulti-field__team1  ulti-field__player1-3"></div>
-        <div class="ulti-field__player  ulti-field__team1  ulti-field__player1-4"></div>
-        <div class="ulti-field__player  ulti-field__team1  ulti-field__player1-5"></div>
+        <div class="ulti-field__player  ulti-field__team1  ulti-field__player1-1">1</div>
+        <div class="ulti-field__player  ulti-field__team1  ulti-field__player1-2">2</div>
+        <div class="ulti-field__player  ulti-field__team1  ulti-field__player1-3">3</div>
+        <div class="ulti-field__player  ulti-field__team1  ulti-field__player1-4">4</div>
+        <div class="ulti-field__player  ulti-field__team1  ulti-field__player1-5">5</div>
 
         <div class="ulti-field__disc"></div>
 
-        <div class="ulti-field__player  ulti-field__team2  ulti-field__player2-1"></div>
-        <div class="ulti-field__player  ulti-field__team2  ulti-field__player2-2"></div>
-        <div class="ulti-field__player  ulti-field__team2  ulti-field__player2-3"></div>
-        <div class="ulti-field__player  ulti-field__team2  ulti-field__player2-4"></div>
-        <div class="ulti-field__player  ulti-field__team2  ulti-field__player2-5"></div>
+        <div class="ulti-field__player  ulti-field__team2  ulti-field__player2-1">1</div>
+        <div class="ulti-field__player  ulti-field__team2  ulti-field__player2-2">2</div>
+        <div class="ulti-field__player  ulti-field__team2  ulti-field__player2-3">3</div>
+        <div class="ulti-field__player  ulti-field__team2  ulti-field__player2-4">4</div>
+        <div class="ulti-field__player  ulti-field__team2  ulti-field__player2-5">5</div>
 
-        <div class="ulti-field__player  ulti-field__player-controls">
-            <button class="ulti-field__player-controls-ok">Ok</button>
-            <button class="ulti-field__player-controls-cancel">&#215;</button>
-        </div>
+        <!--<div class="ulti-field__player  ulti-field__player-controls">-->
+            <!--<button class="ulti-field__player-controls-ok">Ok</button>-->
+            <!--&lt;!&ndash;<button class="ulti-field__player-controls-cancel">&#215;</button>&ndash;&gt;-->
+        <!--</div>-->
 
 
         <div class="ulti-field__zone  ulti-field__zone2"></div>
     </div>
     <div class="ulti-field__descript-log">
         <div class="ulti-field__controls">
+            <a href="#" class="ulti-field__test-config">load test game</a><br>
             <button class="ulti-field__controls-but  ulti-field__controls-prev"> Prev Step</button>
             <button class="ulti-field__controls-but  ulti-field__controls-play"> Next Step</button>
             <button class="ulti-field__controls-but  ulti-field__controls-clear"> Clear</button><br>
@@ -60,19 +61,51 @@
         </div>
 
         <h1 class="ulti-field__descript-log-caption"> Описание:</h1>
-        <div class="ulti-field__step-list">
-            <div class="ulti-field__step">
-                <div class="ulti-field__step-header">
-                    <p class="ulti-field__step-number"></p>
-                    <button class="ulti-field__controls-but  ulti-field__step-save"></button>
-                </div>
-                <div class="ulti-field__step-body"></div>
-            </div>
+
+        <div class="step-list">
+
         </div>
+
+
         <p class="ulti-field__descript-body"></p>
     </div>
 </div>
 
+<template id="step-list__step-temp" style="display: none;">
+    <div class="step-list__step  ">
+        <div class="step-list__step-header  ">
+            <p class="step-list__step-number">Step 1 </p>
+            <!--<button class="step-list__step-save" id="step-save">Save step</button>-->
+            <button class="ulti-field__controls-but" id="step-del">Del</button>
+            <button class="ulti-field__controls-but" id="step-add">+</button>
+        </div>
+        <div class="step-list__step-body">
+            <div class="step-list__step-comment-block">
+                <textarea name="step-comment" id="" cols="30" rows="10" class="step-list__step-comment"></textarea>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="step-list__team1-row-temp" style="display: none;">
+    <div class="step-list__row">
+        <label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team1-player1-coordx"></label>:<label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team1-player1-coordy"></label>
+        <label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team1-player2-coordx"></label>:<label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team1-player2-coordy"></label>
+        <label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team1-player3-coordx"></label>:<label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team1-player3-coordy"></label>
+        <label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team1-player4-coordx"></label>:<label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team1-player4-coordy"></label>
+        <label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team1-player5-coordx"></label>:<label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team1-player5-coordy"></label>
+    </div>
+</template>
+
+<template id="step-list__team2-row-temp" style="display: none;">
+    <div class="step-list__row">
+        <label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team2-player1-coordx"></label>:<label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team2-player1-coordy"></label>
+        <label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team2-player2-coordx"></label>:<label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team2-player2-coordy"></label>
+        <label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team2-player3-coordx"></label>:<label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team2-player3-coordy"></label>
+        <label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team2-player4-coordx"></label>:<label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team2-player4-coordy"></label>
+        <label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team2-player5-coordx"></label>:<label class="step-list__step-player-coords-label" for=""><input type="text" class="step-list__step-player-coords  step-list__step-team2-player5-coordy"></label>
+    </div>
+</template>
 
 <!--<template id="review-template" style="display: none">-->
     <!--<article class="review">-->
