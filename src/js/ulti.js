@@ -500,8 +500,10 @@
         this.addEditGameStep = function (parent, stepNum) {
             var step = document.querySelector('.step-list__step' + stepNum);
             var newStep;
+            var defaultCoords = parent.cloneConfig(parent.DEFAULT_COORDS_5PLAYERS);
 
-            parent.config[0].game.splice((stepNum + 1), 0, parent.DEFAULT_COORDS_5PLAYERS);
+
+            parent.config[0].game.splice((stepNum + 1), 0, defaultCoords);
             parent.changeStepsNumeric(true, stepNum);
             parent.currStep = stepNum + 1;
             parent.showEditGameSteps(parent);
@@ -599,15 +601,26 @@
 
         };
 
-        this.initEditGameFieldListeners = function (parent, isClear) {
-            var ultiField = document.querySelector('.ulti-field__container');
+        this.clearPlayerInConfig = function(parent){
             var currPlayerInConfigElem = document.querySelector('.ulti-field__player-in-config');
 
+            if (currPlayerInConfigElem) {
+                currPlayerInConfigElem.classList.remove('ulti-field__player-in-config');
+                parent.playerInConfig = undefined;
+            }
+
+        };
+
+        this.initEditGameFieldListeners = function (parent, isClear) {
+            var ultiField = document.querySelector('.ulti-field__container');
+            // var currPlayerInConfigElem = document.querySelector('.ulti-field__player-in-config');
+
             if (isClear) {
-                if (currPlayerInConfigElem) {
-                    currPlayerInConfigElem.classList.remove('ulti-field__player-in-config');
-                    parent.playerInConfig = undefined;
-                }
+                parent.clearPlayerInConfig(parent);
+                // if (currPlayerInConfigElem) {
+                //     currPlayerInConfigElem.classList.remove('ulti-field__player-in-config');
+                //     parent.playerInConfig = undefined;
+                // }
 
                 if (!parent.listeners.ultiFieldOnClick) return;
 
@@ -654,11 +667,13 @@
                 // }
 
                 if (evt.target.id === 'step-del') {
+                    parent.clearPlayerInConfig(parent);
                     parent.delEditGameStep(parent, stepNum);
                     return;
                 }
 
                 if (evt.target.id === 'step-add') {
+                    parent.clearPlayerInConfig(parent);
                     parent.addEditGameStep(parent, stepNum);
                     return;
                 }
@@ -673,6 +688,7 @@
                 stepHeader.parentElement.classList.add('step-list__step-open');
                 parent.currStep = stepNum;
 
+                parent.clearPlayerInConfig(parent);
                 parent.initEditGameFieldListeners(parent);
 
                 parent.showStep(parent.config[0].game[stepNum]);
@@ -809,8 +825,19 @@
             // }
         };
 
-        this.cloneConfig = function (config) {
-            return config.slice(0);
+        this.cloneConfig = function (obj) {
+            var clone = {};
+            for (var i in obj) {
+                if (typeof (obj[i]) == "object" && obj[i] != null) {
+                    clone[i] = this.cloneConfig(obj[i]);
+                }
+                else {
+                    clone[i] = obj[i];
+                }
+            }
+            return clone;
+
+            // return config.slice(0);
         };
 
         this.initLoadTestConfig = function (parent) {
@@ -857,6 +884,7 @@
                     parent.showStep(parent.config[0].game[parent.currStep]);
 
                     parent.originalConfig = parent.cloneConfig(parent.config);
+                    console.log(parent.originalConfig);
 
                     break;
             }
