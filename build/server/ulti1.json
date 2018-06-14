@@ -6,13 +6,13 @@
             {
                 "step" : 0,
                 "speed" : 1,
-                "description": "First step of the trap",
+                "description": "Trata sfddf zsdf zsdf zsdf s <script></script>",
                 "teamOneCoords": {
-                    "player0": [1, 44.20],
-                    "player1": [5, 0],
-                    "player2": [60, 24.20],
+                    "player0": [44, 44.20],
+                    "player1": [116, 0],
+                    "player2": [6, 24.20],
                     "player3": [7, 14.80],
-                    "player4": [12, 4]
+                    "player4": [2, 4]
                 },
                 "teamTwoCoords": {
                     "player0": [0.01, 36.20],
@@ -21,13 +21,13 @@
                     "player3": [0, 36],
                     "player4": [8, 36]
                 },
-                "discOwn" : [0, 3]
+                "discOwn" : [0, 2]
             },
 
             {
                 "step" : 1,
                 "speed" : 1,
-                "description": "Second step of the trap",
+                "description": "второй шаг Я свободен",
                 "teamOneCoords": {
                     "player0": [8, 34.20],
                     "player1": [9, 34.20],
@@ -48,7 +48,7 @@
             {
                 "step" : 2,
                 "speed" : 1,
-                "description": "Third step of the trap",
+                "description": "Третий шаг",
                 "teamOneCoords": {
                     "player0": [8, 34.20],
                     "player1": [19, 3.20],
@@ -64,28 +64,8 @@
                     "player4": [15, 33]
                 },
                 "discOwn" : [0, 1]
-            },
-
-            {
-                "step" : 3,
-                "speed" : 1,
-                "description": "step of the trap loremstep of the trap loremstep of the trap loremstep of the trap lorem",
-                "teamOneCoords": {
-                    "player0": [8, 34.20],
-                    "player1": [19, 3.20],
-                    "player2": [12, 2.20],
-                    "player3": [1, 8.80],
-                    "player4": [1, 34]
-                },
-                "teamTwoCoords": {
-                    "player0": [1, 26.20],
-                    "player1": [6, 6],
-                    "player2": [9, 2],
-                    "player3": [12, 30],
-                    "player4": [15, 33]
-                },
-                "discOwn" : [0, 2]
             }
+
         ]
     }
 ]
