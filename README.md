@@ -3,7 +3,7 @@
 You can explain your best tactic step by step using this program.  
  
 <p align="center">
-  <img src=".src/img/creenshot.jpg" alt="Interface example" width="400">
+  <img src="/src/img/creenshot.jpg" alt="Interface example" width="400">
 </p>
 
 You can: <br>
