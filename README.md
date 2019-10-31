@@ -15,7 +15,7 @@ You can: <br>
 
 ## Demo
 
-Working demo: <a href="http://www.novak.su/test/stats">www.novak.su/test/stats</a> <br>
+Working demo: <a href="http://www.novak.su/test">www.novak.su/test</a> <br>
 
 Please, click to 'load test game' to get preview, then use buttons 'Prev Step' and 'Next Step'. You can edit this tactic with 'Edit Game' button. 
 Don't foget to save final tactic to file in your device with 'Save Game'. No server side in the program ;) 

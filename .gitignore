@@ -1,4 +1,6 @@
 node_modules/
+build/
+build_true/
 .DS_Store
 Thumbs.db
 .idea
