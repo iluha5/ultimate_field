@@ -2,8 +2,8 @@
 
 You can explain your best tactic step by step using this program.  
  
-<p align="center">
-  <img src="/src/img/screenshot.jpg" alt="Interface example" width="400">
+<p>
+  <img src="/src/img/ultimate-field.gif" alt="Interface example" width="400">
 </p>
 
 You can: <br>
